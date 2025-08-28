@@ -1,82 +1,103 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '../contexts/ThemeContext';
+
+const { width } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
-  const [inputText, setInputText] = useState('');
+  const [resumeProgress] = useState(60); // Mock progress
+  const { theme } = useTheme();
   
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.mainContainer}>
-        {/* Sidebar with features */}
-        <View style={styles.sidebar}>
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>Jobmate</Text>
+      <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <View style={styles.starIcon}>
+              <Ionicons name="star" size={16} color="#7B68EE" />
+            </View>
+            <Text style={styles.headerTitle}>Starplan</Text>
           </View>
-          
           <TouchableOpacity 
-            style={styles.sidebarItem} 
-            onPress={() => navigation.navigate('ResumeUpload')}
+            style={styles.profileAvatar} 
+            onPress={() => navigation.navigate('ProfileStack')}
           >
-            <Ionicons name="document-text-outline" size={24} color="#fff" />
-            <Text style={styles.sidebarText}>Upload Resume</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.sidebarItem} 
-            onPress={() => navigation.navigate('Chat')}
-          >
-            <Ionicons name="chatbubble-outline" size={24} color="#fff" />
-            <Text style={styles.sidebarText}>Create with AI</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.sidebarItem} 
-            onPress={() => navigation.navigate('JobMatch')}
-          >
-            <Ionicons name="briefcase-outline" size={24} color="#fff" />
-            <Text style={styles.sidebarText}>Job Matches</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.sidebarItem} 
-            onPress={() => navigation.navigate('Profile')}
-          >
-            <Ionicons name="person-outline" size={24} color="#fff" />
-            <Text style={styles.sidebarText}>My Profile</Text>
+            <View style={styles.avatarImage}>
+              <Text style={styles.avatarText}>👩‍💼</Text>
+            </View>
           </TouchableOpacity>
         </View>
+
+        {/* Headline */}
+        <View style={styles.headlineSection}>
+          <Text style={styles.headlineText}>Let me help you</Text>
+          <Text style={styles.headlineText}>craft your <Text style={styles.boldText}>resume</Text></Text>
+        </View>
+
+        {/* AI Resume Builder Card */}
+        <TouchableOpacity 
+          style={styles.aiCard} 
+          onPress={() => navigation.navigate('AI')}
+        >
+          <View style={styles.aiCardHeader}>
+            <View style={styles.aiIcon}>
+              <Text style={styles.aiIconText}>AI</Text>
+            </View>
+            <View style={styles.aiCardContent}>
+              <Text style={styles.aiCardTitle}>Have a conversation with AI</Text>
+              <Text style={styles.aiCardSubtitle}>to build your resume</Text>
+            </View>
+          </View>
+          
+          {/* Progress Bar */}
+          <View style={styles.progressSection}>
+            <Text style={styles.progressLabel}>Resume Progress: {resumeProgress}%</Text>
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${resumeProgress}%` }]} />
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        {/* Find your dream job section */}
+        <Text style={styles.dreamJobTitle}>Find your dream job</Text>
         
-        {/* Main content area - ChatGPT-like interface */}
-        <View style={styles.contentArea}>
-          <View style={styles.welcomeContainer}>
-            <Text style={styles.welcomeTitle}>How may I help you today?</Text>
-            <Text style={styles.welcomeSubtitle}>Ask me anything about job applications, resume building, or career advice</Text>
-          </View>
-          
-          {/* Chat input area - centered like ChatGPT */}
-          <View style={styles.chatInputWrapper}>
-            <KeyboardAvoidingView 
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
-              style={styles.inputContainer}
-            >
-              <TextInput
-                style={styles.input}
-                placeholder="Type your message here..."
-                placeholderTextColor="#8A8A8A"
-                value={inputText}
-                onChangeText={setInputText}
-                multiline
-              />
-              <TouchableOpacity style={styles.sendButton}>
-                <Ionicons name="send" size={24} color="#fff" />
-              </TouchableOpacity>
-            </KeyboardAvoidingView>
-          </View>
-        </View>
-      </View>
-      <StatusBar style="light" />
+        {/* Current Job Offers Button */}
+        <TouchableOpacity onPress={() => navigation.navigate('Jobs')}>
+          <LinearGradient
+            colors={['#4F46E5', '#7C3AED']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientButton}
+          >
+            <View style={styles.buttonIcon}>
+              <Ionicons name="briefcase" size={20} color="#FFFFFF" />
+            </View>
+            <Text style={styles.buttonText}>Current job offers</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* My Applications Button */}
+        <TouchableOpacity onPress={() => navigation.navigate('ApplicationsStack')}>
+          <LinearGradient
+            colors={['#7C3AED', '#EC4899']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.gradientButton, styles.lastButton]}
+          >
+            <View style={styles.buttonIcon}>
+              <Ionicons name="document" size={20} color="#FFFFFF" />
+            </View>
+            <Text style={styles.buttonText}>My Applications</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </ScrollView>
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 };
@@ -84,94 +105,176 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A1F2C', // Dark blue background
+    backgroundColor: '#FFFFFF',
   },
-  mainContainer: {
+  scrollContainer: {
     flex: 1,
+    paddingHorizontal: 20,
+  },
+  header: {
     flexDirection: 'row',
-  },
-  sidebar: {
-    width: '25%',
-    backgroundColor: '#0F1623', // Darker blue for sidebar
-    padding: 20,
-    paddingTop: 40,
-  },
-  logoContainer: {
-    marginBottom: 40,
-    alignItems: 'center',
-  },
-  logoText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#7B68EE', // Exotic purple-blue color
-  },
-  sidebarItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  sidebarText: {
-    color: '#fff',
-    marginLeft: 10,
-    fontSize: 16,
-  },
-  contentArea: {
-    flex: 1,
-    padding: 20,
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 30,
   },
-  chatInputWrapper: {
-    width: '100%',
-    maxWidth: 768,
-    alignSelf: 'center',
-    marginBottom: 20,
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  welcomeContainer: {
-    flex: 1,
+  starIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#F0F0FF',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 8,
   },
-  welcomeTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  welcomeSubtitle: {
+  headerTitle: {
     fontSize: 18,
-    color: '#B0B0B0',
-    textAlign: 'center',
-    maxWidth: '80%',
+    fontWeight: '600',
+    color: '#1F2937',
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#2D3748',
-    borderRadius: 25,
-    padding: 10,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: '#4A5568',
-    width: '100%',
-  },
-  input: {
-    flex: 1,
-    color: '#fff',
-    padding: 10,
-    fontSize: 16,
-    maxHeight: 100,
-  },
-  sendButton: {
-    backgroundColor: '#7B68EE', // Matching exotic color
+  profileAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 20,
+  },
+  avatarText: {
+    fontSize: 20,
+  },
+  headlineSection: {
+    marginBottom: 30,
+  },
+  headlineText: {
+    fontSize: 28,
+    fontWeight: '300',
+    lineHeight: 34,
+    color: '#1F2937',
+  },
+  boldText: {
+    fontWeight: '700',
+  },
+  aiCard: {
+    backgroundColor: '#DCFCE7',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  aiCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  aiIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#16A34A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  aiIconText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  aiCardContent: {
+    flex: 1,
+  },
+  aiCardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1E40AF',
+    marginBottom: 4,
+  },
+  aiCardSubtitle: {
+    fontSize: 15,
+    color: '#3B82F6',
+    fontWeight: '500',
+  },
+  progressSection: {
+    marginTop: 20,
+  },
+  progressLabel: {
+    fontSize: 15,
+    color: '#1E40AF',
+    marginBottom: 10,
+    fontWeight: '600',
+  },
+  progressBarContainer: {
+    backgroundColor: '#E0F2FE',
+    borderRadius: 10,
+    height: 10,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    backgroundColor: '#E0F2FE',
+    height: '100%',
+    borderRadius: 10,
+  },
+  progressFill: {
+    backgroundColor: '#0EA5E9',
+    height: '100%',
+    borderRadius: 10,
+  },
+  dreamJobTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 20,
+  },
+  gradientButton: {
+    borderRadius: 16,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  lastButton: {
+    marginBottom: 30,
+  },
+  buttonIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '700',
+    marginLeft: 12,
   },
 });
 

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput, ActivityIndicator, SafeAreaView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
+import { useTheme } from '../contexts/ThemeContext';
 
 const JobMatchScreen = () => {
+  const { theme } = useTheme();
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -107,50 +110,66 @@ const JobMatchScreen = () => {
 
   const renderJobItem = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.jobCard}>
+      <TouchableOpacity style={[styles.jobCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
         <View style={styles.jobHeader}>
-          <Text style={styles.jobTitle}>{item.title}</Text>
+          <Text style={[styles.jobTitle, { color: theme.colors.text }]}>{item.title}</Text>
           <View style={[styles.matchScoreBadge, 
             item.matchScore >= 90 ? styles.highMatch : 
             item.matchScore >= 80 ? styles.goodMatch : styles.averageMatch
           ]}>
-            <Text style={styles.matchScoreText}>{item.matchScore}% Match</Text>
+            <Text style={styles.matchScoreText}>{item.matchScore}%</Text>
           </View>
         </View>
         
-        <Text style={styles.companyName}>{item.company}</Text>
-        <Text style={styles.jobLocation}>{item.location}</Text>
+        <View style={styles.companyRow}>
+          <Ionicons name="business-outline" size={16} color={theme.colors.textTertiary} />
+          <Text style={[styles.companyName, { color: theme.colors.textSecondary }]}>{item.company}</Text>
+        </View>
         
-        <Text style={styles.jobDescription} numberOfLines={3}>
+        <View style={styles.locationRow}>
+          <Ionicons name="location-outline" size={16} color={theme.colors.textTertiary} />
+          <Text style={[styles.jobLocation, { color: theme.colors.textSecondary }]}>{item.location}</Text>
+        </View>
+        
+        <Text style={[styles.jobDescription, { color: theme.colors.textTertiary }]} numberOfLines={2}>
           {item.description}
         </Text>
         
         <View style={styles.skillsContainer}>
-          {item.skills.map((skill, index) => (
+          {item.skills.slice(0, 3).map((skill, index) => (
             <View key={index} style={styles.skillBadge}>
               <Text style={styles.skillText}>{skill}</Text>
             </View>
           ))}
+          {item.skills.length > 3 && (
+            <View style={styles.moreSkillsBadge}>
+              <Text style={styles.moreSkillsText}>+{item.skills.length - 3}</Text>
+            </View>
+          )}
         </View>
         
         <View style={styles.jobFooter}>
-          <Text style={styles.salary}>{item.salary}</Text>
-          <Text style={styles.postedDate}>Posted: {item.postedDate}</Text>
+          <Text style={[styles.salary, { color: theme.colors.primary }]}>{item.salary}</Text>
+          <TouchableOpacity style={[styles.applyButton, { backgroundColor: theme.colors.primary }]}>
+            <Text style={styles.applyButtonText}>Apply</Text>
+          </TouchableOpacity>
         </View>
-        
-        <TouchableOpacity style={styles.applyButton}>
-          <Text style={styles.applyButtonText}>Apply Now</Text>
-        </TouchableOpacity>
       </TouchableOpacity>
     );
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
+        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Job Matches</Text>
+      </View>
+      
+      <View style={[styles.searchContainer, { backgroundColor: theme.colors.surface }]}>
+        <Ionicons name="search" size={20} color={theme.colors.textTertiary} style={styles.searchIcon} />
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.border, color: theme.colors.text }]}
           placeholder="Search jobs..."
+          placeholderTextColor={theme.colors.textTertiary}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -158,12 +177,12 @@ const JobMatchScreen = () => {
       
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4A90E2" />
-          <Text style={styles.loadingText}>Finding your best matches...</Text>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={[styles.loadingText, { color: theme.colors.textTertiary }]}>Finding your best matches...</Text>
         </View>
       ) : (
         <>
-          <Text style={styles.resultsText}>
+          <Text style={[styles.resultsText, { color: theme.colors.textSecondary }]}>
             {filteredJobs.length} job matches found
           </Text>
           
@@ -176,40 +195,59 @@ const JobMatchScreen = () => {
           />
         </>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#1A1F2C',
+  },
+  header: {
+    backgroundColor: '#0F1623',
     padding: 15,
+    paddingTop: 10,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#2D3748',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#7B68EE',
   },
   searchContainer: {
-    marginBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2D3748',
+    borderRadius: 8,
+    margin: 15,
+    paddingHorizontal: 10,
+  },
+  searchIcon: {
+    marginRight: 10,
   },
   searchInput: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    flex: 1,
     padding: 12,
     fontSize: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    color: '#fff',
     shadowRadius: 2,
     elevation: 2,
   },
   resultsText: {
     fontSize: 16,
-    color: '#666',
+    color: '#CBD5E0',
+    marginHorizontal: 15,
     marginBottom: 10,
   },
   jobsList: {
     paddingBottom: 20,
+    paddingHorizontal: 15,
   },
   jobCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#2D3748',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -223,12 +261,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   jobTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
     flex: 1,
   },
   matchScoreBadge: {
@@ -251,73 +289,96 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12,
   },
+  companyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   companyName: {
-    fontSize: 16,
-    color: '#4A90E2',
-    marginBottom: 4,
+    fontSize: 15,
+    color: '#A0AEC0',
+    marginLeft: 6,
   },
   jobLocation: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 10,
+    color: '#A0AEC0',
+    marginLeft: 6,
   },
   jobDescription: {
     fontSize: 14,
-    color: '#555',
+    color: '#E2E8F0',
+    marginBottom: 15,
     lineHeight: 20,
-    marginBottom: 12,
   },
   skillsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 12,
+    marginBottom: 15,
   },
   skillBadge: {
-    backgroundColor: '#E3F2FD',
-    borderRadius: 15,
+    backgroundColor: '#4A5568',
     paddingHorizontal: 10,
     paddingVertical: 5,
+    borderRadius: 15,
     marginRight: 8,
     marginBottom: 8,
   },
   skillText: {
-    color: '#1976D2',
+    color: '#CBD5E0',
+    fontSize: 12,
+  },
+  moreSkillsBadge: {
+    backgroundColor: '#3A4556',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  moreSkillsText: {
+    color: '#A0AEC0',
     fontSize: 12,
   },
   jobFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 15,
+    alignItems: 'center',
+    marginTop: 10,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#4A5568',
   },
   salary: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
-  },
-  postedDate: {
-    fontSize: 14,
-    color: '#888',
+    color: '#7B68EE',
   },
   applyButton: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#7B68EE',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     borderRadius: 5,
-    padding: 12,
-    alignItems: 'center',
   },
   applyButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
   loadingText: {
-    marginTop: 10,
     fontSize: 16,
-    color: '#666',
+    color: '#CBD5E0',
+    marginTop: 10,
   },
 });
 

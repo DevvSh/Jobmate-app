@@ -10,6 +10,7 @@ const resumeRoutes = require('./routes/resume');
 const chatRoutes = require('./routes/chat');
 const jobRoutes = require('./routes/jobs');
 const profileRoutes = require('./routes/profile');
+const templateRoutes = require('./routes/templates');
 
 const app = express();
 const PORT = process.env.PORT || 5002;
@@ -57,6 +58,7 @@ app.use('/api/resume', resumeRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/templates', templateRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
